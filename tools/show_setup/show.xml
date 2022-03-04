@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<data>
+    <show name="BAG">
+        <code>BAG</code>
+        <dir>X:/projects/01_bag</dir>
+        <cutid>202011110415-b1e20b88e2</cutid>
+        <xlpath>X:/projects/tools/excel/bag</xlpath>
+        <resheight>1080</resheight>
+        <reswidth>1920</reswidth>
+        <fps>pal</fps>
+    </show>
+    <show name="BB">
+        <code>BB</code>
+        <dir>V:/03_bb</dir>
+        <cutid>201706020738-1017329</cutid>
+        <xlpath>X:/projects/tools/excel/bb</xlpath>
+        <resheight>1080</resheight>
+        <reswidth>1920</reswidth>
+        <fps>pal</fps>
+    </show>
+</data>

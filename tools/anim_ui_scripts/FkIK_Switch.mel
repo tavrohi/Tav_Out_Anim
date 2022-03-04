@@ -1,0 +1,268 @@
+//db_FKIK_Maching
+//Written by Anonymous
+//Anony.mous@dont.send.com
+//January 01 0001
+
+global proc db_IKFkWindow()
+{
+
+			if (`window -ex db_IkFkMatch`) 
+			deleteUI db_IkFkMatch ;
+
+			window  -wh 260 87
+				  -s 0
+				  db_IkFkMatch;
+
+				formLayout  dbForm;
+
+				text -fn boldLabelFont -rs 0 -l "Plz select Ik_Fk_Switch_Ctrl." "wartx";
+				button  -c db_FKIK_Maching -w 200  -l ">>>  >>  > GO <  <<  <<<" "gobut";
+				separator -en 0 -width 200 -style "in" "Septor01" ;
+				text -bgc .6 .6 .6 -fn boldLabelFont -label " <<<<< Anonymous >>>>> " "Nametx" ;
+				separator -en 0 -width 200 -style "in" "Septor02" ;
+
+
+			formLayout -e
+						  
+					   -attachForm wartx top 6
+					   -attachForm wartx left 40
+					   
+					   -attachControl gobut top 15 wartx
+					   -attachForm gobut left 30
+					   
+					  -attachControl Septor01 top 7 gobut
+					  -attachForm Septor01 left 0
+					  -attachForm Septor01 right 0
+					   
+					  -attachControl Nametx top 2 Septor01
+					  -attachForm Nametx left 0
+					  -attachForm Nametx right 0
+					  
+					  -attachControl Septor02 top 3 Nametx
+					  -attachForm Septor02 left 0
+					  -attachForm Septor02 right 0
+					   dbForm;
+				
+				  
+				showWindow db_IkFkMatch;
+}
+
+
+
+
+
+////////////////////////////////////////////////
+////////////LEG FK TO Ik Switch proc ////////////////////
+//////////////////////////////////////////////
+
+proc db_LegFKtoIK(string $side,string $Filename)
+{
+		string $side;
+		string $Filename;
+
+		setAttr ($Filename+ ":FKIKLeg_"+$side+".FKIKBlend") 10;
+		setKeyframe ($Filename+ ":FKIKLeg_"+$side+".FKIKBlend");
+
+		string $FkElbCtrl=($Filename+ ":FKKnee_"+$side);
+		string $FkWristCtrl=($Filename+ ":FKAnkle_"+$side);
+
+		string $IKCtrlCtrl=($Filename+ ":IKLeg_"+$side);
+		string $IKPVCtrl=($Filename+ ":PoleLeg_"+$side);
+
+		string $PCIkCtrl[]= `parentConstraint -weight 1 $FkWristCtrl $IKCtrlCtrl`;
+		setKeyframe ($IKCtrlCtrl+".tx");
+		setKeyframe ($IKCtrlCtrl+".ty");
+		setKeyframe ($IKCtrlCtrl+".tz");
+		setKeyframe ($IKCtrlCtrl+".rx");
+		setKeyframe ($IKCtrlCtrl+".ry");
+		setKeyframe ($IKCtrlCtrl+".rz");
+		delete $PCIkCtrl[0];
+
+		string $PCIkPvCtrl[]= `pointConstraint -offset 0 0 0 -weight 1 $FkElbCtrl $IKPVCtrl`;
+		setKeyframe ($IKPVCtrl+".tx");
+		setKeyframe ($IKPVCtrl+".ty");
+		setKeyframe ($IKPVCtrl+".tz");
+		delete $PCIkPvCtrl[0];
+}
+
+
+////////////////////////////////////////////////
+////////////LEG Ik TO FK Switch proc ////////////////////
+//////////////////////////////////////////////
+
+proc db_LegIKtoFK(string $side,string $Filename )
+{
+		string $side;
+		string $Filename;
+
+		setAttr ($Filename+ ":FKIKLeg_"+$side+".FKIKBlend") 0;
+		setKeyframe ($Filename+ ":FKIKLeg_"+$side+".FKIKBlend");
+
+
+		string $FkHipCtrl=($Filename+ ":FKHip_"+$side);
+		string $FkKneeCtrl=($Filename+ ":FKKnee_"+$side);
+		string $FkAnkleCtrl=($Filename+ ":FKAnkle_"+$side);
+
+		string $IKHipJ=($Filename+ ":IKXHip_"+$side);
+		string $IKKneeJ=($Filename+ ":IKXKnee_"+$side);
+		string $IKAnkleJ=($Filename+ ":IKXAnkle_"+$side);
+
+		string $OCFkShCtrl[]=`orientConstraint -weight 1 $IKHipJ $FkHipCtrl`;
+		setKeyframe ($FkHipCtrl+".rx");
+		setKeyframe ($FkHipCtrl+".ry");
+		setKeyframe ($FkHipCtrl+".rz");
+		delete $OCFkShCtrl[0];
+
+
+		string $OCFkElbCtrl[]=`orientConstraint -offset 0 0 0 -skip x -skip y -weight 1 $IKKneeJ $FkKneeCtrl`;
+		setKeyframe ($FkKneeCtrl+".rz");
+		delete $OCFkElbCtrl[0];
+
+		string $OCFkWistCtrl[]= `orientConstraint -weight 1 $IKAnkleJ $FkAnkleCtrl`;
+		setKeyframe ($FkAnkleCtrl+".rx");
+		setKeyframe ($FkAnkleCtrl+".ry");
+		setKeyframe ($FkAnkleCtrl+".rz");
+		delete $OCFkWistCtrl[0];
+
+}
+
+
+////////////////////////////////////////////////
+////////////FK TO Ik Switch proc ////////////////////
+//////////////////////////////////////////////
+
+proc db_FKtoIK(string $side,string $Filename)
+{
+		string $side;
+		string $Filename;
+
+		setAttr ($Filename+ ":" + $side+"_Switch_Ctrl.FK_IK") 10;
+		setKeyframe ($Filename+ ":" + $side+"_Switch_Ctrl.FK_IK");
+
+		string $FkElbCtrl=($Filename+ ":" + $side+"_Fk_El_Ctrl");
+		string $FkWristCtrl=($Filename+ ":" + $side+"_Fk_Wr_Ctrl");
+
+		string $IKCtrlCtrl=($Filename+ ":" + $side+"_WristIk_Ctrl");
+		string $IKPVCtrl=($Filename+ ":" + $side+"_ElbowIk_Ctrl");
+
+
+		string $PCIkCtrl[]= `parentConstraint -weight 1 $FkWristCtrl $IKCtrlCtrl`;
+		setKeyframe ($IKCtrlCtrl+".tx");
+		setKeyframe ($IKCtrlCtrl+".ty");
+		setKeyframe ($IKCtrlCtrl+".tz");
+		setKeyframe ($IKCtrlCtrl+".rx");
+		setKeyframe ($IKCtrlCtrl+".ry");
+		setKeyframe ($IKCtrlCtrl+".rz");
+		delete $PCIkCtrl[0];
+
+		string $PCIkPvCtrl[]= `pointConstraint -offset 0 0 0 -weight 1 $FkElbCtrl $IKPVCtrl`;
+		setKeyframe ($IKPVCtrl+".tx");
+		setKeyframe ($IKPVCtrl+".ty");
+		setKeyframe ($IKPVCtrl+".tz");
+		delete $PCIkPvCtrl[0];
+}
+
+////////////////////////////////////////////////
+////////////Ik TO FK Switch proc ////////////////////
+//////////////////////////////////////////////
+
+proc db_IKtoFK(string $side,string $Filename )
+{
+			string $side;
+			string $Filename;
+
+			setAttr ($Filename+ ":" + $side+"_Switch_Ctrl.FK_IK") 0;
+			setKeyframe ($Filename+ ":" + $side+"_Switch_Ctrl.FK_IK");
+
+
+			string $FkShoCtrl=($Filename+ ":" + $side+"_Fk_Sh_Ctrl");
+			string $FkElbCtrl=($Filename+ ":" + $side+"_Fk_El_Ctrl");
+			string $FkWristCtrl=($Filename+ ":" + $side+"_Fk_Wr_Ctrl");
+
+			string $IKShoJ=($Filename+ ":" + $side+"_Ik_Sh_J");
+			string $IKElbJ=($Filename+ ":" + $side+"_Ik_El_J");
+			string $IKWistJ=($Filename+ ":" + $side+"_Ik_Wr_J");
+
+			string $OCFkShCtrl[]=`orientConstraint -weight 1 $IKShoJ $FkShoCtrl`;
+			setKeyframe ($Filename+ ":" + $side+"_Fk_Sh_Ctrl.rx");
+			setKeyframe ($Filename+ ":" + $side+"_Fk_Sh_Ctrl.ry");
+			setKeyframe ($Filename+ ":" + $side+"_Fk_Sh_Ctrl.rz");
+			delete $OCFkShCtrl[0];
+
+
+			string $OCFkElbCtrl[]=`orientConstraint -offset 0 0 0 -skip x -skip y -weight 1 $IKElbJ $FkElbCtrl`;
+			setKeyframe ($Filename+ ":" + $side+"_Fk_El_Ctrl.rz");
+			delete $OCFkElbCtrl[0];
+
+			string $OCFkWistCtrl[]= `orientConstraint -weight 1 $IKWistJ $FkWristCtrl`;
+			setKeyframe ($Filename+ ":" + $side+"_Fk_Wr_Ctrl.rx");
+			setKeyframe ($Filename+ ":" + $side+"_Fk_Wr_Ctrl.ry");
+			setKeyframe ($Filename+ ":" + $side+"_Fk_Wr_Ctrl.rz");
+			delete $OCFkWistCtrl[0];
+
+}
+
+
+////////////////////////////////////////////////
+////////////Character side proc ////////////////////
+//////////////////////////////////////////////
+
+proc string db_side(string $SelCtrl)
+{
+			string $Bana;
+			string $SelCtrl;
+			if(((`match "L_" $SelCtrl`)=="L_")||((`match "g_L" $SelCtrl`)=="g_L") )
+			{ $Bana="L";}
+			else 
+			$Bana="R";
+			return $Bana;
+}
+
+
+////////////////////////////////////////////////
+////////////Main Proc db_FKIK_Maching ////////////////////
+//////////////////////////////////////////////
+
+ global proc db_FKIK_Maching()
+{
+		string $selChar[] = `ls -sl`;
+		if(size($selChar)==0)
+		{error "Plz Select IKFK_Swith Ctrl.";}
+
+		for ($x = 0; $x < size($selChar); $x++)
+		{
+			if((size($selChar)>0) && ((`match "Switch_Ctrl" $selChar[$x]`)=="Switch_Ctrl"))
+				{
+					string $side=`db_side($selChar[$x])`;
+					//string $selCharfileName = `referenceQuery -f -shn $selChar[$x]`;
+					$Filename = `substitute  (":"+$side+"_Switch_Ctrl") $selChar[$x] ""  `;
+					float $IkFkSwitch=`getAttr ($Filename+ ":" + $side+"_Switch_Ctrl.FK_IK")` ;
+					if($IkFkSwitch==10)
+					db_IKtoFK($side, $Filename);
+					if($IkFkSwitch==0)
+					db_FKtoIK($side, $Filename);
+					print "Done by >>>>>>Anonymous<<<<<<<<<<";
+				}
+			else if ((size($selChar)>0) && ((`match "FKIKLeg_" $selChar[$x]`)=="FKIKLeg_"))
+				{
+					string $side=`db_side($selChar[$x])`;
+					$Filename = `substitute  (":FKIKLeg_"+$side) $selChar[$x] ""  `;
+					float $IkFkSwitch=`getAttr ($Filename+ ":FKIKLeg_"+$side+".FKIKBlend")`;
+					if($IkFkSwitch==10)
+					db_LegIKtoFK($side, $Filename);
+					if($IkFkSwitch==0)
+					db_LegFKtoIK($side, $Filename);
+					print "Done by >>>>>>Anonymous<<<<<<<<<<";
+				}
+			else
+				{
+					error "Plz Select IKFK_Swith Ctrl.";
+				}
+		}
+						 deleteUI db_IkFkMatch ;
+
+}
+
+
+
+

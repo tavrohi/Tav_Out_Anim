@@ -1,0 +1,7 @@
+Steps to install the anim tools.
+
+1. Copy the anim tool folder into X:\ drive
+2. make sure all the files are there in "X:\anim_tools" not in "X:\anim_tools\anim_tools"
+3. copy and overright maya.env file in "C:\Users\user\Documents\Maya\2020"
+4. All set ready to go!
+

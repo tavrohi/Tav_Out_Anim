@@ -1,0 +1,161 @@
+global proc string[] getGeo()
+{
+    string $transforms[] = `ls -long -g`;
+    string $polyMeshes[] = `filterExpand -sm 12 $transforms`;
+    return $polyMeshes;
+}
+
+global proc slctsmthmsh()
+{
+    string $polysmoothgeo[];
+    for ( $geo in getGeo() )
+    {
+       int $found = 0;
+       string $history[] = `listHistory $geo`;
+       for ( $node in $history )
+       {
+         if ( `nodeType $node` == "polySmoothFace" )
+             {
+                  $found = 1;
+                  break;
+             } 
+       }
+       if ( $found )
+       {
+           $polysmoothgeo[ `size $polysmoothgeo` ] = $geo;
+       }
+       select -r $polysmoothgeo;
+    }
+}  
+global proc asDelSelPS()
+{
+    $allSelObj = `ls -sl`;
+    string $newE;
+    string $polySmoothSel[];
+    for($each in $allSelObj)
+    {
+        $sourceShapeNode = `listRelatives -s -ni $each`;
+        int $exist = catchQuiet (`listConnections -type polySmoothFace ($sourceShapeNode)`);
+        if ( $exist == 0 )
+        {
+            string $polySmoothSel[] = `listHistory $each`;
+            for ($newE in $polySmoothSel)
+            {
+                if (`nodeType $newE` == "polySmoothFace")
+                {
+                    if(`objExists $newE`)
+                    {
+                        catchQuiet(`delete $newE`);
+                    }
+                }   
+            }
+        }
+        print"Smooth Deleted From Selection";
+    }
+}
+
+global proc asDelAllPS(){
+	$polySmoothAll = `ls -typ "polySmoothFace"`;
+	catchQuiet (`delete $polySmoothAll`);
+	print"All Smooth Deleted";
+}
+
+global proc polyselectcon(string $btncomand)
+{
+    if($btncomand == "tri"){polySelectConstraint -m 3 -t 8 -sz 1;}
+    if($btncomand == "qua"){polySelectConstraint -m 3 -t 8 -sz 2;}
+    if($btncomand == "nside"){polySelectConstraint -m 3 -t 8 -sz 3;}
+	if($btncomand == "refresh"){catchQuiet(`polySelectConstraint -size 0`);}
+}
+
+global proc scva(){
+	polyMoveVertex -localTranslate 0 0 0;
+	doBakeNonDefHistory( 1, {"prePost"});
+}
+
+global proc Clean_Editors(){   
+	Close_All_Window();  
+	catchQuiet(`modelEditor -edit -displayAppearance boundingBox modelPanel4`); 
+	string $panel =`getPanel -wf`;   
+	catchQuiet(`modelEditor -edit -displayAppearance boundingBox $panel`); 
+	string $psns[] = `getPanel -type modelPanel`;
+	int $i;
+	for($i=0;$i<size($psns);$i++){
+		catchQuiet(`modelEditor -edit -displayAppearance boundingBox $psns[$i]`);
+	}
+	close_Attri_editor(); 
+    PluginCleen();	
+}
+
+global proc PluginCleen(){
+	string $unknownNodes[] = `ls -type "unknown"`; 
+
+	for($node in $unknownNodes){ 
+		print( "Deleting " + $node + "\n" ); 
+		lockNode -lock 0 $node; 
+		delete $node; 
+	} 
+
+	string $plugin;
+	string $unknownPlugins[] = `unknownPlugin -query -list`;
+	for ($plugin in $unknownPlugins) { 
+		unknownPlugin -remove $plugin;
+	}			
+}
+
+global proc Close_All_Window(){    
+	global string $gMainWindow;
+	string $allOpenWindows[] = `lsUI -wnd`;
+	for ($items in $allOpenWindows){
+		if ($items != $gMainWindow){
+			catchQuiet(`window -e -vis 0 $items`);
+		}
+	}    
+}
+
+	
+global proc close_Attri_editor(){   
+	int $foo = `isAttributeEditorVisible`;   
+	if ($foo == 1){       
+		toggleUIComponentVisibility "Attribute Editor" ;    
+	}   
+}
+
+global proc remove_unload_references()
+{			
+	string $refss[]=`file -q -r `;
+	int $ks=0;
+	for($ks=0;$ks<size($refss);$ks++)
+	{
+		int $chk = `referenceQuery  -il $refss[$ks]`;
+		// print($chk + "\n");
+		if($chk == 0)
+		{
+			file -rr  $refss[$ks];
+		}
+	} 
+	print "UNWANTED REFERENCE DELETED";
+}
+
+global proc remove_extra_cam()
+{
+    string $cameras[]=`listCameras -o`;
+    for ($camera in $cameras)
+    {
+        int $chk = `gmatch $camera "top"`;
+        int $chk1 = `gmatch $camera "side"`;
+        int $chk2 = `gmatch $camera "front"`;
+        int $chk3 = `gmatch $camera "*fosterParent*"`;
+        if ($chk == 0 && $chk1 == 0 && $chk2 == 0 )
+        {
+            catchQuiet(`camera -e -startupCamera false $camera`);
+            catchQuiet(`delete $camera`);
+        }
+        if ($chk3 == 1)
+        {
+            string $pathNodes[];
+            int $numTokens = tokenize($camera, "|", $pathNodes);
+            catchQuiet(`delete $pathNodes[0]`);
+        }
+    }
+}

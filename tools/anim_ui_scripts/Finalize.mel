@@ -1,0 +1,577 @@
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////
+// Owner : Anonymous.
+//
+// Description : This script will -	
+//				> Optimize with All Safe Options.
+//				> Remove ALL Namespaces from the scene.
+//				> Delete Duplicate Light Links.
+//				> Create Default Light Set if missing.
+//				> Unlock All Nodes.
+//				> Scan all transforms for keys and list them. 
+//
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+
+global proc finalizze()
+{
+	if (`windowPref -ex Finalize`==1) windowPref -r Finalize;	
+	if(`window -q -ex Finalize`) deleteUI Finalize;
+	window -w 308 -h 450 -s 1 -mxb 0 Finalize;
+	formLayout myUI1;
+	text -l "Super Duper File Finalizer" txts;
+	separator -width 300 "separator27" ;
+	separator -width 300 "separator25" ;
+	separator -width 300 "separator24" ;
+	separator -width 300 "separator23" ;
+	separator -width 300 "separator22" ;
+	separator -width 300 "separator21" ;
+	text -en 0 -label "*******" -font "boldLabelFont" "text68" ;
+	text -en 0 -label "by Anonymous" -font "boldLabelFont" "text67" ;
+	button -c sbtslrem -label "-" -width 20 -height 20 -annotation "Remove selected items.." "button16" ;
+	textScrollList -sc sbtslcmd -ams 1 -width 250 -height 145 "tsl1" ;
+	text -label "Ctrls with Keys.." -font "boldLabelFont" -width 100 "text64" ;
+	button -c sbfinal -width 210 -height 30 -label "<<  Finalize  >>" "button15" ;
+	checkBox -v 1 -label "Remove Namespaces"  -width 250 "checkBox7" ;
+	checkBox -v 1 -label "in Hierarchy" -width 250 "checkBox6" ;
+	checkBox -v 1 -label "Safe Optimize" -width 250 "checkBox5" ;
+	checkBox -v 1 -width 155 -label "Scan transforms for Keys" "checkBox4" ;
+	checkBox -v 1 -label "Unlock All Nodes"  -width 250 "checkBox3" ;
+	checkBox -v 1 -label "Default light set" -width 250 "checkBox2" ;
+	checkBox -v 1 -label "Duplicate Light Links"  -width 250 "checkBox1" ;
+	checkBox -v 1 -label "Unknown nodes"  -width 250 "checkBox8" ;
+	checkBox -v 1 -label "Clean Plugin"  -width 250 "PluginCleanup" ;
+	formLayout -e
+		-af "txts" "left" 16
+		-af "txts" "top" 14
+		-af "text68" "left" 32
+		-af "text68" "right" 0
+		-af "text68" "bottom" 6
+		-af "text67" "left" 16
+		-af "text67" "right" 0
+		-af "text67" "bottom" 20
+		-af "button16" "top" 256
+		-af "button16" "right" 08
+		-af "tsl1" "left" 16
+		-af "tsl1" "top" 215
+		-af "tsl1" "right" 36
+		-af "tsl1" "bottom" 50
+		-af "text64" "left" 16
+		-af "text64" "top" 195
+		-af "button15" "left" 45
+		-af "checkBox8" "left" 250
+		-af "checkBox8" "top" 100
+		-af "PluginCleanup" "left" 250
+		-af "PluginCleanup" "top" 80
+		-af "button15" "top" 140
+		-af "checkBox7" "left" 48
+		-af "checkBox7" "top" 56
+		-af "checkBox5" "left" 48
+		-af "checkBox5" "top" 40
+		-af "checkBox4" "left" 48
+		-af "checkBox4" "top" 120
+		-af "checkBox6" "left" 250
+		-af "checkBox6" "top" 120
+		-af "checkBox3" "left" 48
+		-af "checkBox3" "top" 104
+		-af "checkBox2" "left" 48
+		-af "checkBox2" "top" 88
+		-af "checkBox1" "left" 48
+		-af "checkBox1" "top" 72
+		-af "separator25" "left" 16
+		-af "separator25" "right" 16
+		-af "separator25" "top" 32
+		-af "separator24" "left" 16
+		-af "separator24" "right" 16
+		-af "separator24" "top" 185
+		-af "separator23" "left" 16
+		-af "separator23" "right" 16
+		-af "separator23" "top" 181
+		-af "separator22" "left" 16
+		-af "separator22" "right" 16
+		-af "separator22" "bottom" 42
+		-af "separator21" "left" 16
+		-af "separator21" "right" 16
+		-af "separator21" "bottom" 38
+		-af "separator27" "left" 16
+		-af "separator27" "right" 16
+		-af "separator27" "bottom" 3
+		myUI1;
+	showWindow Finalize;
+}
+
+
+
+global proc sbtslrem()
+{
+	string $tslsel[]=`textScrollList -q -si tsl1`;
+	for ($j=0;$j<`size($tslsel)`;$j++)
+	{
+		textScrollList -e -ri $tslsel[$j] tsl1;
+	}
+}
+
+
+global proc sbtslcmd()
+{
+	string $tslseln[]=`textScrollList -q -si tsl1`;
+	select $tslseln;
+}
+
+
+global proc sbKeyChek()
+{
+	string $sel[];
+	$sel=`ls -type transform`;
+
+	if (`checkBox -q -v checkBox6`==1)
+	{ 
+		select -hi;
+		$sel=`ls -sl -type transform`;
+	}
+	
+	float $key[];
+	textScrollList -e -ra tsl1;
+	
+	for ($i=0;$i<`size($sel)`;$i++)
+	{
+		$key=`keyframe -q $sel[$i]`;
+		if (`size($key)`!=0)
+		{
+			textScrollList -e -a $sel[$i] tsl1;
+		}
+	}
+}
+
+
+global proc sbsetoptionvar()
+{	
+	optionVar -intValue nurbsSrfOption 0;
+	optionVar -intValue nurbsCrvOption false;
+	optionVar -intValue unusedNurbsSrfOption false;//
+	optionVar -intValue deformerOption 0;
+	optionVar -intValue unusedSkinInfsOption 0;
+	optionVar -intValue poseOption false;
+	optionVar -intValue clipOption false;
+	optionVar -intValue expressionOption false;
+	optionVar -intValue groupIDnOption true;
+	optionVar -intValue animationCurveOption true;
+	optionVar -intValue shaderOption true;//
+	optionVar -intValue cachedOption false;
+	optionVar -intValue transformOption true;
+	optionVar -intValue displayLayerOption true;
+	optionVar -intValue renderLayerOption true;
+	optionVar -intValue setsOption 0;
+	optionVar -intValue partitionOption false;
+	optionVar -intValue locatorOption false;
+	optionVar -intValue ptConOption true;
+	optionVar -intValue pbOption true;
+	optionVar -intValue snapshotOption true;
+	optionVar -intValue unitConversionOption true;
+	optionVar -intValue referencedOption true;
+	optionVar -intValue brushOption true;
+	optionVar -intValue unknownNodesOption 1;
+	optionVar -intValue shadingNetworksOption false;
+}
+
+
+global proc as_RemoveLockNode()
+{
+	string $eachLong;
+	$tempSel = `ls`;
+	
+	for ($eachLong in $tempSel)
+	{
+		lockNode -l 0 $eachLong;
+	}
+	print ("\n"+"All Nodes Unlocked.");
+}
+
+global proc assdefLight()
+{
+	setAttr :defaultLightSet.ro no;
+	print ("\n"+"Default LightSet Correted.");
+}
+
+global proc aslinks()
+{
+	string $L_Lin[]=`listConnections -c 1 "lightLinker1"`;
+	string $Even_L[];
+	string $Odd_D[];
+	clear $Even_L;
+	clear $Odd_D;
+	int $a,$b;
+	$a=0;
+	$b=0;
+	for($i=0;$i<=size($L_Lin);$i+=2)
+	{
+		$Even_L[$a]=$L_Lin[$i];
+		$a+=1;
+	}
+	for($x=1;$x<=size($L_Lin);$x+=2)
+	{
+		$Odd_D[$b]=$L_Lin[$x];
+		$b+=1;
+	}
+	//print (size($Even_L));
+	//print (size($Odd_D));
+	for($j=-1;$j<=size($Odd_D);$j+=2)
+	{
+		if(($Odd_D[$j+1]) == ($Odd_D[$j+2]))
+		{
+			disconnectAttr ":initialShadingGroup.msg" $Even_L[$j+1];
+			delete $Even_L[$j+1];
+			disconnectAttr ":initialShadingGroup.msg" $Even_L[$j+2];
+			delete $Even_L[$j+2];
+		}
+	}
+}
+
+global proc breakLinkk()
+{
+	
+	string $xt_isg[] = `listConnections -s 1 -p 1 initialShadingGroup.message`;
+	for ( $invalue in $xt_isg )
+	{
+		if($invalue != "initialMaterialInfo.shadingGroup")
+		{
+			disconnectAttr initialShadingGroup.message $invalue;		
+		}
+	}	
+	print ("\n"+"Duplicate Light Links Removed.");
+}
+
+
+global proc sbns()
+{
+	string $allNS[] = `namespaceInfo -lon`;
+	for ($i = 0; $i < size($allNS); $i++)
+	{
+	    if (($allNS[$i] != "UI") && ($allNS[$i] != "shared"))
+	    {
+	        catchQuiet(`namespace -force -mv $allNS[$i] ":"`);
+	        catchQuiet(`namespace -rm $allNS[$i]`);
+	    }
+	} 
+}
+
+
+global proc sbRemoveNSproc()
+{	
+	string $allNS[] = `namespaceInfo -lon`;
+	int $sbnns=`size($allNS)`; $sbnns=($sbnns*3);
+
+	for ($j=0;$j<=$sbnns;$j++)
+	{
+		sbns;
+	} 	
+	
+	string $chekNS[] = `namespaceInfo -lon`;
+	if (`size($chekNS)`==2)
+		{
+			print ("\n"+"Removed all Namespaces from the Scene.");
+		}
+}
+
+global proc delete_unknown()
+{
+    string $transforms[] = `ls -tr`; 
+    string $shapes[] = `filterExpand -sm 12 $transforms`; 
+    int $i=0;
+    for($shape in $shapes)
+            {
+               select $shape;
+               doBakeNonDefHistory( 1, {"prePost" });
+               select -cl;
+            }
+    
+	string $sets[]=`ls -type objectSet`;
+	int $k;
+	for($k=0;$k<size($sets);$k++)
+	{
+		string $connections[]=`listConnections -c 1 -p 1 $sets[$k]`;
+		for($c in $connections)
+		{
+		if(`gmatch $c "*dagSetMembers*"`)
+			{
+				//print($sets[$k]+"\n");
+				break;
+			}
+		}
+	}
+    string $unobjs[]=`ls -type unknown -type unknownDag -type unknownTransform`;
+    for($i=0;$i<size($unobjs);$i++)
+    {
+        catchQuiet(`delete $unobjs[$i]`);
+    }
+    
+
+    string  $getPolyNormal[] = `ls -long -type "polyNormal"`;
+    for($node in  $getPolyNormal)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+    }
+    
+    string $getBrush[] = `ls -long -type "brush"`;
+    for($i=0;$i<size($getBrush);$i++)
+    {
+        delete $getBrush[$i];
+    }
+    
+    
+    string $getpolyBridgeEdge[] = `ls -long -type "polyBridgeEdge"`;
+    for($node in $getpolyBridgeEdge)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+    }
+    
+    string $getsubdHierBlind[] = `ls -long -type "subdHierBlind"`;
+    for($i=0;$i<size($getsubdHierBlind);$i++)
+    {
+        delete $getsubdHierBlind[$i];
+    }
+    
+     
+    string $getpolyExtrudeEdge[] = `ls -long -type "polyExtrudeEdge"`;
+    for($node in $getpolyExtrudeEdge)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+    }
+    
+    string $getpolySplitRing[] = `ls -long -type "polySplitRing"`;
+    for($node in $getpolySplitRing)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+    }
+    
+    string $getpolyMapCut[] = `ls -long -type "polyMapCut"`;
+    for($node in $getpolyMapCut)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+     
+    string $getmentalrayOptions[] = `ls -long -type "mentalrayOptions"`;
+    for($node in $getmentalrayOptions)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+     
+    string $getmentalrayItemsList[] = `ls -long -type "mentalrayItemsList"`;
+    for($node in $getmentalrayItemsList)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+     
+     
+    string $getmentalrayGlobals[] = `ls -long -type "mentalrayGlobals"`;
+    for($node in $getmentalrayGlobals)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+    
+    
+    string $getdagPose[] = `ls -long -type "dagPose"`;
+    for($node in $getdagPose)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+     
+    string $getilrBakeLayerManager[] = `ls -long -type "ilrBakeLayerManager"`;
+    for($node in $getilrBakeLayerManager)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+     
+    string $getilrOptionsNode[] = `ls -long -type "ilrOptionsNode"`;
+    for($node in $getilrOptionsNode)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+     
+    string $getilrUIOptionsNode[] = `ls -long -type "ilrUIOptionsNode"`;
+    for($node in $getilrUIOptionsNode)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+    
+    string $getilrBakeLayer[] = `ls -long -type "ilrBakeLayer"`;
+    for($node in $getilrBakeLayer)
+    {
+        string $cnctn[] = `listConnections $node` ; 
+        int $cnctnchk = 0;
+        for ($cn in $cnctn)
+        {
+            $cnctnchk = stringArrayContains($cn, $shapes);
+        }
+        if ($cnctnchk==0)
+        {
+            catchQuiet(`delete $node`);
+        }
+     }
+    
+    
+   
+     catchQuiet(`delete_objects("*cameraView*")`);
+     catchQuiet(`delete_objects("*uiConfigurationScriptNode*")`);
+     catchQuiet(`delete_objects("*defaultViewColorManager*")`);
+     //catchQuiet(`delete_objects("*deleteComponent*")`);
+     //catchQuiet(`delete_objects("*Preview*")`);
+   
+}
+
+
+global proc PluginCleen(){
+	string $unknownNodes[] = `ls -type "unknown"`; 
+
+	for($node in $unknownNodes){ 
+		print( "Deleting " + $node + "\n" ); 
+		lockNode -lock 0 $node; 
+		delete $node; 
+	} 
+
+	string $plugin;
+	string $unknownPlugins[] = `unknownPlugin -query -list`;
+	for ($plugin in $unknownPlugins) { 
+		unknownPlugin -remove $plugin;
+	}			
+}
+
+
+
+global proc sbfinal()
+{
+	int $opti=`checkBox -q -v checkBox5`;
+	int $llink=`checkBox -q -v checkBox1`;
+	int $lset=`checkBox -q -v checkBox2`;
+	int $lockn=`checkBox -q -v checkBox3`;
+	int $skey=`checkBox -q -v checkBox4`;
+	int $rns=`checkBox -q -v checkBox7`;
+	int $unknown=`checkBox -q -v checkBox8`;
+	int $plugin=`checkBox -q -v PluginCleanup`;
+
+	if ($opti==1) sbsetoptionvar;
+	if ($opti==1) 
+	{
+		OptimizeScene;
+		print ("\n"+"File Optimized with All Safe Options.");
+	}
+	if ($llink==1) breakLinkk;
+	if ($llink==1) catch (`aslinks`);
+	if ($lset==1) assdefLight;
+	if ($rns==1) sbRemoveNSproc;
+	if ($lockn==1) as_RemoveLockNode;
+	if ($skey==1) catch (`sbKeyChek`);
+	if ($unknown==1) delete_unknown();
+	if ($plugin==1) PluginCleen();
+
+	print ("ALL DONE. File Finalized.");
+}

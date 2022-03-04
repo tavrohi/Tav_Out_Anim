@@ -1,0 +1,78 @@
+global proc string RenderCamBake(string $cam_name){
+        // --- Creating the camera --- //
+        string $bakeCam[] = `camera`;
+        string $bCnme = `rename $bakeCam[0] "R_cam_baked"`;
+        
+        // --- Setting up the camera --- //
+        setAttr ($bCnme+".nearClipPlane") 1;
+        setAttr ($bCnme+".farClipPlane") 1000000000000;
+        camera -e 
+            -ar `camera -q -ar $cam_name`
+            -coi `camera -q -coi $cam_name`
+            -cp `camera -q -cp $cam_name`
+            -cs `camera -q -cs $cam_name`
+            -dfc `camera -q -dfc $cam_name`
+            -dgm `camera -q -dgm $cam_name`
+            -dfg `camera -q -dfg $cam_name`
+            -dfo `camera -q -dfo $cam_name`
+            -dfp `camera -q -dfp $cam_name`
+            -dof `camera -q -dof $cam_name`
+            -dr `camera -q -dr $cam_name`
+            -dsa `camera -q -dsa $cam_name`
+            -dst `camera -q -dst $cam_name`
+            -fd `camera -q -fd $cam_name`
+            -ff `camera -q -ff $cam_name`
+            -ffd `camera -q -ffd $cam_name`
+            -ffo `camera -q -ffo $cam_name`
+            -fro `camera -q -fro $cam_name`
+            -frv `camera -q -frv $cam_name`
+            -fth `camera -q -fth $cam_name`
+            -ftv `camera -q -ftv $cam_name`
+            -fl `camera -q -fl $cam_name`
+            -fs `camera -q -fs $cam_name`
+            -hc `camera -q -hc $cam_name`
+            -hfv `camera -q -hfv $cam_name`
+            -hfa `camera -q -hfa $cam_name`
+            -hfo `camera -q -hfo $cam_name`
+            -hs `camera -q -hs $cam_name`
+            -hrp `camera -q -hrp $cam_name`
+            -lsr `camera -q -lsr $cam_name`
+            -jc `camera -q -jc $cam_name`
+            -mb `camera -q -mb $cam_name`
+            -nfd `camera -q -nfd $cam_name`
+            -pze `camera -q -pze $cam_name`
+            -rpz `camera -q -rpz $cam_name`
+            -hpn `camera -q -hpn $cam_name`
+            -vpn `camera -q -vpn $cam_name`
+            -zom `camera -q -zom $cam_name`
+            -pts `camera -q -pts $cam_name`
+            -prs `camera -q -prs $cam_name`
+            -sa `camera -q -sa $cam_name`
+            -vfv `camera -q -vfv $cam_name`
+            -vfa `camera -q -vfa $cam_name`
+            -vfo `camera -q -vfo $cam_name`
+            -vs `camera -q -vs $cam_name`
+            -vrp `camera -q -vrp $cam_name`
+            -vl `camera -q -vl $cam_name` $bCnme;
+            
+        // --- Transferring Focal Length Anim --- //
+        connectAttr -f ($cam_name + ".focalLength") ($bCnme + ".focalLength");
+            
+        // --- Parenting the new cam --- //
+        string $pConstrain[] = `pointConstraint  -offset 0 0 0 -weight 1 $cam_name $bCnme`;
+        string $oConstrain[] = `orientConstraint  -offset 0 0 0 -weight 1 $cam_name $bCnme`;
+            
+        // --- Smart Baking --- //
+            // --- Time Slider Values --- //
+            float $TsStart = `playbackOptions -q -min`;
+            float $TsEnd = `playbackOptions -q -max`;
+        bakeResults -sampleBy 1 -time ($TsStart + ":" + $TsEnd) -preserveOutsideKeys 1 -sparseAnimCurveBake 0 {($bCnme+".focalLength"), ($bCnme+".translateX"), ($bCnme+".translateY"), ($bCnme+".translateZ"), ($bCnme+".rotateX"), ($bCnme+".rotateY"), ($bCnme+".rotateZ")};
+
+        // --- Deleting Parent Connections --- //
+        delete $pConstrain[0];
+        delete $oConstrain[0];
+        
+
+        select -cl;
+        return $bCnme;
+}
