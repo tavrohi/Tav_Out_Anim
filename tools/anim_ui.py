@@ -13,8 +13,8 @@ def windowanimlayout():
     cmds.text(l="",h=10)
     
     cmds.button(label = "Anim/Layout Check and Playblast", width=200, bgc=(0.1,0.1,0.1), c=("anim_ui.apbui()"))
-    cmds.button(label = "FK IK Switch", width=200, bgc=(0.1,0.1,0.1), c="maya.mel.eval('source \"tools/anim_ui_scripts/FkIK_Switch.mel\"; db_IKFkWindow;')")
-    cmds.button(label = "Auto Tangent", width=200, bgc=(0.1,0.1,0.1), c="maya.mel.eval('source \"tools/anim_ui_scripts/Auto_Tangent.mel\"; autoTangent;')")
+    #cmds.button(label = "FK IK Switch", width=200, bgc=(0.1,0.1,0.1), c="maya.mel.eval('source \"tools/anim_ui_scripts/FkIK_Switch.mel\"; db_IKFkWindow;')")
+    #cmds.button(label = "Auto Tangent", width=200, bgc=(0.1,0.1,0.1), c="maya.mel.eval('source \"tools/anim_ui_scripts/Auto_Tangent.mel\"; autoTangent;')")
     cmds.button(label = "Crack Selections", width=200, bgc=(0.1,0.1,0.1), c="maya.mel.eval('source \"tools/anim_ui_scripts/CrackSelections.mel\"; craSelections;')")
     cmds.button(label = "Auto Save", width=200, bgc=(0.1,0.1,0.1), c="maya.mel.eval('source \"tools/anim_ui_scripts/AutoSave.mel\"; autosaveoon;')")
     cmds.button(label = "FINALIZE", width=200, bgc=(0.1,0.1,0.1), c="maya.mel.eval('source \"tools/anim_ui_scripts/Finalize.mel\"; finalizze;')")
