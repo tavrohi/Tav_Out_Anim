@@ -53,7 +53,7 @@ def dopb():
     max = int(cmds.playbackOptions(q=1, max=1))
     try:
         cmds.playblast(format='qt', filename=pat, forceOverwrite=True, clearCache=True, viewer=True,
-                        showOrnaments=True, percent=100, compression='PNG', sound=sound_node, useTraxSounds=True, offScreen=True,
+                        showOrnaments=True, percent=100, compression='MPEG-4 Video', sound=sound_node, useTraxSounds=True, offScreen=True,
                         widthHeight=[1920, 1080], st=min, et=max)
     except RuntimeError:
         cmds.confirmDialog( title='QT unavailable',  icon="critical", message="QT not found. Kindly install QuickTime and restart Maya", button=['Okay'], defaultButton='Okay', cancelButton='Okay')
@@ -141,14 +141,42 @@ def datedisp():
     cmds.headsUpDisplay("HUD_datedisp", section=3, block=3, blockSize="small", dfs="large", lfs="large", ao=2, l="Date and Time", command=datetime, atr=1)
 
 def check():
-    usernamepbdisp()
-    projectnamedisp()
-    cnamedisp()
-    camfldisp()
-    framndisp()
-    filenmedisp()
-    cntrefdisp()
-    datedisp()
+    try:
+        usernamepbdisp()
+    except:
+        pass
+    try:
+        projectnamedisp()
+    except:
+        pass
+    try:
+        cnamedisp()
+    except:
+        pass
+    try:
+        camfldisp()
+    except:
+        pass
+    try:
+        framndisp()
+    except:
+        pass
+    try:
+        camnamedisp()
+    except:
+        pass
+    try:
+        filenmedisp()
+    except:
+        pass
+    try:
+        cntrefdisp()
+    except:
+        pass
+    try:
+        datedisp()
+    except:
+        pass
     
 def rem():
     cmds.headsUpDisplay( "HUD_usernamepbdisp", rem=True )
