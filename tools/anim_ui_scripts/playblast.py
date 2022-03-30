@@ -20,7 +20,6 @@ def playbblastmain(status):
     ogmskopo = cmds.getAttr(cshp+".displayGateMaskOpacity")
     oovscn = cmds.getAttr(cshp+".overscan")
     cmds.setAttr(cshp+".displayGateMaskOpacity", 1)
-    cmds.setAttr(cfcus+".displayFilmGate", 1)
     cmds.setAttr(cfcus+".displayResolution", 1)
     cmds.setAttr(cfcus+".displayGateMask", 1)
     cmds.setAttr(cshp+".overscan", 1.2)
@@ -36,7 +35,6 @@ def playbblastmain(status):
     cmds.setAttr(cshp+".overscan", oovscn)
     cmds.setAttr(cfcus+".displayGateMaskColor", ogmskcolor[0][0], ogmskcolor[0][1], ogmskcolor[0][2], type='double3')
     cmds.setAttr(cshp+".displayGateMaskOpacity", ogmskopo)
-    cmds.setAttr(cfcus+".displayFilmGate", 0)
     cmds.setAttr(cfcus+".displayResolution", 0)
     cmds.setAttr(cfcus+".displayGateMask", 0)
     
