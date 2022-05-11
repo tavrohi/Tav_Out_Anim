@@ -1,7 +1,7 @@
 import maya.cmds as cmds
 import pymel.core as pm
 import maya.mel as mel
-from tools.lit_ui_scripts.lit_save_ui import HEIGHT
+#from tools.lit_ui_scripts.lit_save_ui import HEIGHT
 import tools.showxml as xm
 import os
 import sans as ss
