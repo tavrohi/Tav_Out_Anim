@@ -36,7 +36,8 @@ def windowanimui():
 
 def apbui(item=None):
     reload(fc)
-    fc.wincheckui()
+    abc = fc.animFCmod()
+    abc.wincheckui()
 
 if __name__ == "__main__":
     windowanimui()
